@@ -50,12 +50,14 @@
 			}
 		</style>
 	</head>
-	<body>
+	<body onload=showAlert()>
+		
 
 		<video id="videoBacker" loop src="assets/Matrix.mp4" autoplay muted ></video>
 	
 		
 		<script>
+		
 			// vars
 			var num = 30;
 			var objects = [];
@@ -63,6 +65,9 @@
 			var mouse = new THREE.Vector3();
 			var light, t;
 
+			function showAlert(){
+				alert("Hello World");
+			}
 			// create camera
 			var camera = new THREE.PerspectiveCamera(
 			    100,
@@ -162,16 +167,22 @@
 
 				for (i = 0; i <= num; i++) {
 					var o = objects[i];
-					o.rotation.y += 0.001;
+					o.rotation.y += 0.0001;
 					if (i % 2 == 0) {
-						o.radians += 0.05;
-						o.radians2 += 0.005;
-					} else {
+						o.radians += 0.2;
+						o.radians2 += 0.00001;
+					}else if( (i % 3 == 0)){
+
+						o.radians += 0.001;
+						o.radians2 += 0.01;
+
+					}
+					 else {
 						o.radians -= 0.005;
 						o.radians2 -= 0.005;
 					}
-					o.position.x = Math.cos(o.radians) * o.distance;
-					o.position.z = Math.sin(o.radians) * o.distance;
+					o.position.x = Math.cos(o.radians) * o.distance* 1.2;
+					o.position.z = Math.sin(o.radians) * o.distance * 2;
 					o.position.y = Math.sin(o.radians2) * o.distance * 0.5;
 				}
 
