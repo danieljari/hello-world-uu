@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Daniel Jari</title>
+		<!-- don't initilize thrre.js from file if we want to upload online on github-->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+		<style>
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+			}
+			h1 {
+				color: rgb(245, 12, 12);
+				position: absolute;
+				top: 50%;
+				z-index: 100;
+				width: 100%;
+				text-align: center;
+				transform: translate(0, -100%);
+				font-family: 'Raleway', sans-serif;
+				font-weight: 100;
+				letter-spacing: 30px;
+				text-transform: uppercase;
+				font-size: 20px;
+			}
+			h2 {
+				color: rgb(209, 209, 209);
+				position: absolute;
+				top: 50%;
+				z-index: 100;
+				width: 100%;
+				text-align: center;
+				transform: translate(0, 120%);
+				font-family: 'Raleway', sans-serif;
+				font-weight: 100;
+				letter-spacing: 20px;
+				text-transform: uppercase;
+				font-size: 16px;
+			}
+			#videoBacker {
+				background-size: cover;
+				object-fit: cover;
+				z-index: 9;
+				opacity: 0.25;
+				position: absolute;
+			
+				
+			}
+		</style>
+	</head>
+	<body>
+
+		<video id="videoBacker" loop src="assets/Matrix.mp4" autoplay muted ></video>
+	
+		
+		<script>
+			// vars
+			var num = 30;
+			var objects = [];
+			var raycaster = new THREE.Raycaster();
+			var mouse = new THREE.Vector3();
+			var light, t;
+
+			// create camera
+			var camera = new THREE.PerspectiveCamera(
+			    100,
+				window.innerWidth / window.innerHeight,
+				0.1,
+				100
+			);
+			camera.position.set(0.0, 0.0, 5);
+
+			// create a scene
+			var scene = new THREE.Scene();
+
+			// create renderer
+			var renderer = new THREE.WebGLRenderer({ antialias: false});
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(renderer.domElement);
+
+			
+
+			// load a ground texture
+			
+
+			// create ground material
+			material = new THREE.MeshPhysicalMaterial({
+				map: texture,
+				bumpMap: texture,
+			});
+
+			// create ground mesh
+			var geometry = new THREE.PlaneBufferGeometry(100, 100);
+			var ground = new THREE.Mesh(geometry, material);
+			ground.rotation.z = (Math.PI / 180) * -45;
+			ground.rotation.x = (Math.PI / 180) * -90;
+			ground.position.y = -2.0;
+			scene.add(ground);
+
+			// texture
+			var texture = new THREE.TextureLoader().load(
+				'assets/computer_system.png'
+			);
+
+			// create environment map
+			// hur vikitigt att ha dessa textures? räcker det inte med 'assets/computer_system.png'?
+			var envMap = new THREE.CubeTextureLoader()
+				.setPath('assets/')
+				.load(['py.jpg', 'py.jpg', 'py.jpg', 'py.jpg', 'py.jpg', 'py.jpg']);
+
+			// create Tetrahedron // eller ngt annat
+			var geometry = new THREE.OctahedronGeometry(2, 0);
+			var material = new THREE.MeshPhysicalMaterial({
+				map: texture,
+				envMap: envMap,
+				metalness: 4.0,
+				roughness: 9.0,
+			});
+			t = new THREE.Mesh(geometry, material);
+			t.rotation.x = (Math.PI / 180);
+			scene.add(t);
+
+
+		
+			for (i = 0; i <= num; i++) {
+				// create new mesh
+				
+				var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+				var material = new THREE.MeshPhysicalMaterial({
+					map: texture,
+					envMap: envMap,
+					metalness: 1.0,
+				});
+				// create mesh
+				var particle = new THREE.Mesh(geometry, material);
+				// set random position
+				particle.position.set(
+					Math.random() * 100.0 - 50.0,
+					0.0,
+					Math.random() * -10.0
+				);
+				// calc distnace as constant and assign to object
+				var a = new THREE.Vector2(0, 0, 0);
+				var b = particle.position;
+				var d = a.distanceTo(b);
+				particle.distance = d;
+				// define 2 random but constant angles in radians
+				particle.radians = (Math.random() * 360 * Math.PI) / 180; // initial angle
+				particle.radians2 = (Math.random() * 360 * Math.PI) / 180; // initial angle
+				// add object to scene
+				scene.add(particle);
+				// add to collection
+				objects.push(particle);
+			}
+// animate movement in objects
+			var animate = function () {
+				requestAnimationFrame(animate);
+			
+				camera.lookAt(t.position);
+
+				for (i = 0; i <= num; i++) {
+					var o = objects[i];
+					o.rotation.y += 0.001;
+					if (i % 2 == 0) {
+						o.radians += 0.05;
+						o.radians2 += 0.005;
+					} else {
+						o.radians -= 0.005;
+						o.radians2 -= 0.005;
+					}
+					o.position.x = Math.cos(o.radians) * o.distance;
+					o.position.z = Math.sin(o.radians) * o.distance;
+					o.position.y = Math.sin(o.radians2) * o.distance * 0.5;
+				}
+
+				renderer.render(scene, camera);
+			};
+			animate();
+                        // mouse input on event
+			document.addEventListener('mousemove', onDocumentMouseMove, false);
+			function onDocumentMouseMove(event) {
+				event.preventDefault();
+				mouse.x = (event.clientX / renderer.domElement.clientWidth) * 12 - 1;
+				mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 12 + 1;
+				raycaster.setFromCamera(mouse, camera);
+				var intersects = raycaster.intersectObjects(objects, true);
+			
+				t.rotation.z = mouse.x * 0.5;
+				t.rotation.x = mouse.y * 0.5;
+			}
+		</script>
+
+		<h1>HELLO WORLD</h1>
+		
+		<h2>Welcome Martin</h2>
+		
+
+	</body>
+</html>
