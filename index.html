@@ -167,23 +167,19 @@
 
 				for (i = 0; i <= num; i++) {
 					var o = objects[i];
-					o.rotation.y += 0.0001;
+					o.rotation.y += 0.001;
 					if (i % 2 == 0) {
-						o.radians += 0.2;
-						o.radians2 += 0.00001;
-					}else if( (i % 3 == 0)){
-
 						o.radians += 0.001;
-						o.radians2 += 0.01;
-
+						o.radians2 += 0.001;
+					
 					}
 					 else {
 						o.radians -= 0.005;
-						o.radians2 -= 0.005;
+						o.radians2 += 0.005;
 					}
-					o.position.x = Math.cos(o.radians) * o.distance* 1.2;
-					o.position.z = Math.sin(o.radians) * o.distance * 2;
-					o.position.y = Math.sin(o.radians2) * o.distance * 0.5;
+					o.position.x = Math.cos(o.radians) * o.distance* 0.5;
+					o.position.z = Math.sin(o.radians) * o.distance * 0.5;
+					o.position.y = Math.sin(o.radians2) * o.distance * 0.1;
 				}
 
 				renderer.render(scene, camera);
@@ -193,8 +189,8 @@
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
 			function onDocumentMouseMove(event) {
 				event.preventDefault();
-				mouse.x = (event.clientX / renderer.domElement.clientWidth) * 12 - 1;
-				mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 12 + 1;
+				mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+				mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
 				raycaster.setFromCamera(mouse, camera);
 				var intersects = raycaster.intersectObjects(objects, true);
 			
